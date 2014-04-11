@@ -1,10 +1,7 @@
 # Node modules
 EXIT = require 'exit'
-FS = require 'fs'
 Q = require 'q'
 TPL = require 'lodash.template'
-GLOB = require 'glob'
-GS = require 'glob-stream'
 ES = require 'event-stream'
 ASYNC = require 'async'
 MOUT = require 'mout'
@@ -32,18 +29,6 @@ util.promise = ( fn ) ->
 
 # Asynchronous Methods
 util.each = ASYNC.each
-
-# Filesystem wrappers
-util.readFile = Q.denodeify FS.readFile
-util.writeFile = Q.denodeify FS.writeFile
-util.pathExists = Q.denodeify FS.exists
-util.readFileSync = FS.readFileSync
-util.writeFileSync = FS.writeFileSync
-util.pathExistsSync = FS.existsSync
-
-# Globbing
-util.glob = Q.denodeify GLOB
-util.globStream = GS.create
 
 # Streams
 util.toStream = ES.map
@@ -102,6 +87,10 @@ util.isArray = ( value ) ->
   util.isA value, "Array"
 util.isFunction = ( value ) ->
   util.isA value, "Function"
+util.isString = ( value ) ->
+  util.isA value, "String"
+util.isStream = ( value ) ->
+  util.isA value, "Stream"
 
 # Execute a function for every non-object property, recursing into objects and arrays.
 # This is a direct port of grunt.util.recurse

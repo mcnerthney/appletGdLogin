@@ -22,6 +22,7 @@ nExpose = ( o, fn, newFn ) ->
 
 # Gruntless, Good to Go
 nRequire 'task'
+nRequire 'help'
 nRequire 'util'
 nRequire 'plugins'
 nRequire 'config'
@@ -30,6 +31,7 @@ nRequire 'log'
 nRequire 'options'
 nRequire 'flow'
 nRequire 'bootstrap'
+nRequire 'file'
 
 # Expose some methods from the included libs directly under the ngbp namespace.
 nExpose ngbp.task, 'engage'

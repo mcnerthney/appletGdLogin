@@ -1,6 +1,7 @@
 # Node libraries
 NOMNOM = require 'nomnom'
 PKG = require './../../package.json'
+UTIL = require 'util'
 
 # ngbp libraries
 ngbp = require './../ngbp'
@@ -140,7 +141,9 @@ cli = () ->
 
     # If requested, print out a configuration value.
     if options.conf?
-      ngbp.log.writeln "#{options.conf} = #{ngbp.config( options.conf )}"
+      option = UTIL.inspect ngbp.config( options.conf ),
+        colors: true
+      ngbp.log.writeln "\n#{options.conf} = #{option}"
 
     # TODO(jdm): process inject
     # if options.inject
@@ -152,15 +155,13 @@ cli = () ->
     #   options.injectWatch.forEach ( task ) ->
     #     TASK.inject UTIL.parseTaskString( task, true )
 
-    # TODO(jdm): process tasks
+    # Print out a task list, if requested.
     if options.tasks?
-      ngbp.log.header "Defined Tasks:"
-      ngbp.task.getTasks().forEach ( task ) ->
-        ngbp.log.writeln task.name
-        if task.dep.length
-          ngbp.log.writeln "  - " + task.dep.join( " " )
+      ngbp.help.printTaskTable()
 
-    # TODO(jdm): process flows
+    # Print out a flows list, if requested.
+    if options.flows?
+      ngbp.help.printFlowsTable()
 
     # Number One, make it so!
     if runDefaultTasks or options.todo?.length > 0

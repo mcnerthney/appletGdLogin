@@ -7,7 +7,7 @@ MERGE = require 'deepmerge'
 GRUNT = require 'grunt'
 
 # ngbp libs
-UTIL = require './util'
+ngbp = require './../ngbp'
 
 ###
 # Default ngbp options
@@ -67,13 +67,13 @@ propStringTmplRe = /^<%=\s*([a-z0-9_$]+(?:\.[a-z0-9_$]+)*)\s*%>$/i
 config.process = ( raw ) ->
   # recurse will call the given for every non-object, non-array property of the given
   # object, however deep it has to go to do it.
-  UTIL.forEveryProperty raw, ( value ) ->
+  val = ngbp.util.forEveryProperty raw, ( value ) ->
     if not value?
       return value
 
     # We cannot process a non-string value (e.g. a number or a stream or whatnot) as a template, so
     # just return it.
-    if UTIL.typeOf( value ) isnt 'String'
+    if ngbp.util.typeOf( value ) isnt 'String'
       return value
 
     # If possible, access the specified property via config.get, in case it
@@ -88,7 +88,7 @@ config.process = ( raw ) ->
         return result
 
     # Process the string as a template.
-    return UTIL.template value, _config
+    return ngbp.util.template value, _config
 
 ###
 # Merge a config object into the current configuration.
@@ -168,10 +168,10 @@ config.write = ( includeSystem ) ->
   else
     conf = _userConfig
 
-  UTIL.stringifyJson conf, true
+  ngbp.util.stringifyJson conf, true
   .then ( json ) ->
     # write to ngbp.json
-    return UTIL.writeFile OPTIONS( 'configPath' ), contents
+    return ngbp.file.writeFile OPTIONS( 'configPath' ), contents
   , ( err ) ->
     LOG.fatal "Could not stringify JSON for config: #{err.toString()}"
 

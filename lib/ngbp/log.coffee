@@ -7,7 +7,7 @@ OPTIONS = require './options'
 UTIL = require './util'
 
 # Whether or not to prefix the log messages with "[ngbp] "
-prefix = true
+prefix = false
 
 # The log module
 log = module.exports = {}

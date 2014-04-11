@@ -14,7 +14,7 @@ module.exports = ( options ) ->
   # Locate the configuration file and save its path for later use
   configPath = FINDUP ngbp.options( 'configPath' ), { cwd: process.cwd() }
 
-  ngbp.util.readFile( configPath )
+  ngbp.file.readFile( configPath )
   .then ( file ) ->
     ngbp.debug.log "Config information loaded from #{configPath}"
     # Save the config file location for later use
@@ -30,20 +30,31 @@ module.exports = ( options ) ->
     # Load the config into ngbp
     ngbp.config.init config
 
+    # TODO(jdm): Read in the package.json, if available
+    pkgPath = FINDUP "package.json", { cwd: process.cwd() }
+    ngbp.file.readFile( pkgPath )
+  , ( err ) ->
+    ngbp.fatal "Could not parse config file: #{err.toString()}"
+  .then ( file ) ->
+    ngbp.debug.log "package.json read from disk."
+    ngbp.util.parseJson file
+  , ( err ) ->
+    ngbp.fatal "Could not load package.json: #{err.toString()}"
+  .then ( pkg ) ->
+    ngbp.debug.log "package.json loaded to `pkg`."
+    ngbp.config "pkg", pkg
+
     # Load all the plugins
     ngbp.plugins.load()
   , ( err ) ->
-    ngbp.fatal "Could not parse config file: #{err.toString()}"
+    ngbp.fatal "Could not parse package.json: #{err.toString()}"
   .then () ->
     flows = ngbp.flow.all()
     tasks = {}
 
     # Create tasks for every flow.
     flows.forEach ( flow ) ->
-      # TODO(jdm): get flow dependencies too
-      taskName = flow.getTaskName()
-      ngbp.task.add taskName, [], () ->
-        flow.run()
+      taskName = ngbp.task.addFlowTask flow
 
       # Keep track of which flows must run during which meta-tasks
       flow.options.tasks.forEach ( task ) ->

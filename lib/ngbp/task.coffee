@@ -51,5 +51,18 @@ Tasks::getTasks = () ->
 
   tasks
 
+Tasks::addCleanTask = ( name, target ) ->
+  taskName = "clean::#{name}"
+  @add taskName, () ->
+    ngbp.verbose.log "[#{name}] Cleaning #{target}"
+    ngbp.file.rimraf target
+  taskName
+
+Tasks::addFlowTask = ( flow ) ->
+  taskName = "flow::#{flow.name}"
+  @add taskName, flow.getDependencies(), () ->
+    flow.run()
+  taskName
+
 module.exports = new Tasks()
 

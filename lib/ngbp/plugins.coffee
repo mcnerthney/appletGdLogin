@@ -38,7 +38,7 @@ plugins.loadPlugins = ( plugin_dir, config ) ->
   if pluginRegistry.indexOf( plugin_dir ) isnt -1
     ngbp.log.warning "#{plugin_dir} has already been loaded. Skipping it for now."
     ngbp.util.q true
-  else if not ngbp.util.pathExistsSync plugin_dir
+  else if not ngbp.file.pathExistsSync plugin_dir
     ngbp.log.fatal "Plugin directory #{plugin_dir} doesn't exist."
   else
     # Read in the configuration from the provided metadata, if provided.
@@ -47,7 +47,7 @@ plugins.loadPlugins = ( plugin_dir, config ) ->
       ngbp.config.merge config
 
     # Locate all the plugin files.
-    ngbp.util.glob( PATH.join( plugin_dir, '*.{js,coffee}' ) )
+    ngbp.file.glob( PATH.join( plugin_dir, '*.{js,coffee}' ) )
     .then ( files ) ->
       if not files? or files.length is 0
         ngbp.log.warning "No plugins found in path #{plugin_dir}"
@@ -76,7 +76,7 @@ plugins.loadNpmPlugins = () ->
   modules_dir = PATH.resolve 'node_modules'
 
   # Stream all the package files
-  ngbp.util.glob( PATH.join( modules_dir, '/*/package.json' ) )
+  ngbp.file.glob( PATH.join( modules_dir, '/*/package.json' ) )
   .then ( files ) ->
     if not files?.length
       ngbp.debug.log "There were no NPM packages to attempt to load."
@@ -84,7 +84,7 @@ plugins.loadNpmPlugins = () ->
 
     ngbp.util.promise ( deferred ) ->
       ngbp.util.each files, ( file, callback ) ->
-        contents = ngbp.util.readFileSync( file )
+        contents = ngbp.file.readFileSync( file )
         pkg = ngbp.util.parseJsonSync( contents )
         if pkg?.keywords? and pkg.keywords.indexOf( 'ngbpplugin' ) isnt -1
           ngbp.verbose.log "Found ngbp plugin #{pkg.name}"
