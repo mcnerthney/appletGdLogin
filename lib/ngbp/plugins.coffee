@@ -33,7 +33,7 @@ plugins.load = () ->
 # TODO(jdm): inject tasks from config
 
 plugins.loadPlugins = ( plugin_dir, config ) ->
-  ngbp.verbose.log "Loading plugins from path '#{plugin_dir}'..."
+  ngbp.verbose.log "Loading plugins from path '#{plugin_dir}'"
 
   if pluginRegistry.indexOf( plugin_dir ) isnt -1
     ngbp.log.warning "#{plugin_dir} has already been loaded. Skipping it for now."

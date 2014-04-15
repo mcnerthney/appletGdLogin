@@ -1,6 +1,6 @@
 {
   "name": "ngbp",
-  "version": "0.4.0-alpha.4",
+  "version": "0.4.0-alpha.5",
   "description": "A flexible, extensible, best-practices build automation and management system for web projects.",
   "homepage": "https://github.com/ngbp/ng-boilerplate",
   "author": {
@@ -24,17 +24,11 @@
     "node": ">= 0.8"
   },
   "main": "index.js",
-  "devDependencies": {
-    "coffee-script": "~1.6.3"
-  },
   "dependencies": {
     "async": "~0.2",
-    "command": "0.0.4",
     "mout": "~0.8",
-    "nopt": "~2.1.2",
     "q": "~0.9.7",
     "colors": "~0.6.2",
-    "prompt": "~0.2.12",
     "mkdirp": "~0.3.5",
     "exit": "~0.1.2",
     "findup-sync": "~0.1.2",
@@ -45,9 +39,10 @@
     "nomnom": "~1.6.2",
     "lodash.template": "~2.4.1",
     "glob": "~3.2.8",
-    "glob-stream": "~3.1.9",
     "coffee-script": "~1.7.0",
     "cli-table": "~0.2.0",
-    "rimraf": "~2.2.6"
+    "rimraf": "~2.2.6",
+    "streamqueue": "0.0.6",
+    "csslint": "^0.10.0"
   }
 }

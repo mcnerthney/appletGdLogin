@@ -1,8 +1,9 @@
 # Node modules
 EXIT = require 'exit'
+FS = require 'fs'
 Q = require 'q'
 TPL = require 'lodash.template'
-ES = require 'event-stream'
+GLOB = require 'glob'
 ASYNC = require 'async'
 MOUT = require 'mout'
 
@@ -30,8 +31,16 @@ util.promise = ( fn ) ->
 # Asynchronous Methods
 util.each = ASYNC.each
 
-# Streams
-util.toStream = ES.map
+# Filesystem wrappers
+util.readFile = Q.denodeify FS.readFile
+util.writeFile = Q.denodeify FS.writeFile
+util.pathExists = Q.denodeify FS.exists
+util.readFileSync = FS.readFileSync
+util.writeFileSync = FS.writeFileSync
+util.pathExistsSync = FS.existsSync
+
+# Globbing
+util.glob = Q.denodeify GLOB
 
 # JSON
 util.parseJsonSync = JSON.parse

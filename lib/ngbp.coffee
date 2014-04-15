@@ -32,6 +32,7 @@ nRequire 'options'
 nRequire 'flow'
 nRequire 'bootstrap'
 nRequire 'file'
+nRequire 'streams'
 
 # Expose some methods from the included libs directly under the ngbp namespace.
 nExpose ngbp.task, 'engage'

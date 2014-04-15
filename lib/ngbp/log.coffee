@@ -1,6 +1,7 @@
 # node modules
 COLORS = require 'colors'
 MOUT = require 'mout'
+Table = require 'cli-table'
 
 # ngbp libraries
 OPTIONS = require './options'
@@ -74,6 +75,28 @@ log.disablePrefix = () ->
 
 log.enablePrefix = () ->
   prefix = true
+
+log.table = ( rows ) ->
+  table = new Table
+    chars:
+      'top': ""
+      'top-mid': ""
+      'top-left': ""
+      'top-right': ""
+      'bottom': ""
+      'bottom-mid': ""
+      'bottom-left': ""
+      'bottom-right': ""
+      'left': ""
+      'left-mid': ""
+      'mid': ""
+      'mid-mid': ""
+      'right': ""
+      'right-mid': ""
+      'middle': ""
+  rows.forEach ( row ) ->
+    table.push row
+  log.writeln table.toString()
 
 # Create verbose versions of the log functions.
 # Concept totally ripped from Grunt.

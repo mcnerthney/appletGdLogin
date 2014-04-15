@@ -38,25 +38,7 @@ help.printFlowsTable = () ->
     streams = ngbp.util.mout.array.pluck( flow.getStreams(), 'name' ).join ", "
 
     ngbp.log.subheader flow.name
-    table = new Table
-      colWidths: [ 10, 87 ]
-      colAligns: [ 'right', 'left' ]
-      chars:
-        'top': ""
-        'top-mid': ""
-        'top-left': ""
-        'top-right': ""
-        'bottom': ""
-        'bottom-mid': ""
-        'bottom-left': ""
-        'bottom-right': ""
-        'left': ""
-        'left-mid': ""
-        'mid': ""
-        'mid-mid': ""
-        'right': ""
-        'right-mid': ""
-        'middle': ""
+    table = new Table()
 
     table.push
       Source: source

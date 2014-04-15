@@ -1,8 +1,10 @@
-VFS = require 'vinyl-fs'
 FS = require 'fs'
 PATH = require 'path'
 Q = require 'q'
 rimraf = Q.denodeify require( 'rimraf' )
+
+# ngbp
+ngbp = require './../ngbp'
 
 # Exported module
 file = module.exports = {}
@@ -32,9 +34,15 @@ file.rimraf = ( target ) ->
 
 # Globbing
 file.glob = Q.denodeify require( 'glob' )
-file.globStream = require( 'glob-stream' ).create
 
-# Stream Creation
-file.sourceStream = VFS.src
-file.destStream = VFS.dest
+# Some convenience wrappers.
+file.relativePath = ( one, two ) ->
+  PATH.relative one, two
+file.absolutePath = ( relativePath, start ) ->
+  start ?= process.cwd()
+  file.joinPath start, relativePath
+file.joinPath = ( one, two ) ->
+  PATH.join one, two
+file.dirname = ( path ) ->
+  PATH.dirname path
 

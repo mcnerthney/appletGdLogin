@@ -13,24 +13,29 @@ module.exports = ( options ) ->
 
   # Locate the configuration file and save its path for later use
   configPath = FINDUP ngbp.options( 'configPath' ), { cwd: process.cwd() }
+  promise = ngbp.util.q "{}"
+  if not configPath?
+    ngbp.log.warning "No config file found. Using empty configuration instead."
+  else
+    ngbp.debug.log "Config found: #{configPath}"
+    promise = ngbp.file.readFile( configPath )
 
-  ngbp.file.readFile( configPath )
+  promise
   .then ( file ) ->
-    ngbp.debug.log "Config information loaded from #{configPath}"
     # Save the config file location for later use
-    ngbp.options 'configFile', configPath
+    ngbp.options 'configFile', configPath || 'ngbp.json'
     ngbp.options 'projectPath', PATH.dirname( configPath )
 
     # Parse its contents
     ngbp.util.parseJson file
   , ( err ) ->
-    ngbp.fatal "Could not read config file: #{err.toString()}"
+    ngbp.fatal "Could not read config file: #{err.toString()}."
   .then ( config ) ->
     ngbp.debug.log "Config loaded."
     # Load the config into ngbp
     ngbp.config.init config
 
-    # TODO(jdm): Read in the package.json, if available
+    # Read in the package.json. It's required.
     pkgPath = FINDUP "package.json", { cwd: process.cwd() }
     ngbp.file.readFile( pkgPath )
   , ( err ) ->
@@ -50,21 +55,49 @@ module.exports = ( options ) ->
     ngbp.fatal "Could not parse package.json: #{err.toString()}"
   .then () ->
     flows = ngbp.flow.all()
-    tasks = {}
 
-    # Create tasks for every flow.
+    # Flow tasks are tasks that represent single flows.
+    flowTasks = {}
+
+    # The meta-tasks are automatically generated based on the configuration of flows.
+    metaTasks = {}
+
+    getFlowTaskName = ( flowName ) ->
+      "flow::#{flowName}"
+
+    # Gather up the list of flow tasks.
     flows.forEach ( flow ) ->
-      taskName = ngbp.task.addFlowTask flow
+      taskName = getFlowTaskName flow.name
+      flowTasks[taskName] = flow.getDependencies()
+
+    # Now loop through the flows again and add their reverse dependencies (e.g. for a merge). Also,
+    # create the flow tasks and gather the data necessary to create meta tasks for every flow task.
+    flows.forEach ( flow ) ->
+      taskName = getFlowTaskName flow.name
+
+      flow.priorTo.forEach ( task ) ->
+        depName = getFlowTaskName task
+        if not flowTasks[depName]?
+          ngbp.fatal "Unknown task when adding reverse dependency for #{flow.name} - #{depName}"
+
+        flowTasks[depName].push taskName
 
       # Keep track of which flows must run during which meta-tasks
       flow.options.tasks.forEach ( task ) ->
-        if not tasks[task]?
-          tasks[task] = []
+        if not metaTasks[task]?
+          metaTasks[task] = []
 
-        tasks[task].push taskName
-        
+        metaTasks[task].push taskName
+
+    # Now create the actual flow-tasks from the information we've collected.
+    flows.forEach ( flow ) ->
+      taskName = getFlowTaskName flow.name
+      deps = flowTasks[taskName]
+      ngbp.task.add taskName, deps, () ->
+        flow.run()
+
     # Now create the meta-tasks with the flow tasks as dependent tasks.
-    ngbp.util.mout.object.forOwn tasks, ( deps, task ) ->
+    ngbp.util.mout.object.forOwn metaTasks, ( deps, task ) ->
       ngbp.task.add task, deps
 
     ngbp.util.q true

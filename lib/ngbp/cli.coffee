@@ -57,12 +57,13 @@ options = NOMNOM
   help: 'Set or change a configuration value. Must be used with --get. Use --write to save to ngbp.json.'
 .option 'prevent',
   abbr: 'p'
-  help: 'A comma-separated list of tasks to prevent from running. Use --write to save to ngbp.json.'
+  help: 'Prevent a flow step/stream from running. Can be specified multiple times. Use --write to ' +
+    'save to ngbp.json.'
   list: true
 .option 'allow',
   abbr: 'a'
-  help: 'A comma-separated list of tasks to allow, overwriting whether they are prevented. Use ' +
-    '--write to save to ngbp.json, if necessary.'
+  help: 'Allow a flow step/stream to run, overwriting whether they are prevented already. Can be ' +
+    'specified multiple times. Use --write to save to ngbp.json, if necessary.'
   list: true
 .option 'inject',
   abbr: 'i'
@@ -125,23 +126,34 @@ cli = () ->
 
   ngbp.bootstrap( options )
   .then () ->
+    ###
     # Handle the command line options
+    ###
 
-    # TODO(jdm): process prevent
-    # if options.prevent
-    #   options.prevent.forEach TASK.preventTask
+    # Add any CLI-prevented tasks to the config.
+    # TODO(jdm): we should be able to also prevent and allow whole tasks and plugins
+    if options.prevent?
+      tasks = options.prevent.map ( t ) -> t.trim()
+      ngbp.config.user 'prevent', tasks, true
 
-    # TODO(jdm): process allow
-    # if options.allow
-    #   options.allow.forEach TASK.allowTask
+    # Add any CLI-allowed tasks to the config.
+    if options.allow?
+      tasks = options.allow.map ( t ) -> t.trim()
+      ngbp.config.user 'allow', tasks, true
 
     # TODO(jdm): process plugins
 
-    # TODO(jdm): process set
+    # If requested, set a config value temporarily.
+    if options.set?
+      ngbp.log.warning "--set requires --conf to specify a key." if not options.conf?
+      ngbp.config.user.set options.conf, options.set
 
     # If requested, print out a configuration value.
+    # TODO(jdm): support JSON for merging
     if options.conf?
-      option = UTIL.inspect ngbp.config( options.conf ),
+      method = if options.raw? then 'getRaw' else 'get'
+      obj = if options.user? then ngbp.config.user else ngbp.config
+      option = UTIL.inspect obj[method]( options.conf ),
         colors: true
       ngbp.log.writeln "\n#{options.conf} = #{option}"
 

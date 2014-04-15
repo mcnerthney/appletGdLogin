@@ -22,7 +22,16 @@ Tasks::engage = ( t ) ->
   if tasks.length is 0
     ngbp.log.log "There are no tasks to run."
   else
-    ngbp.verbose.log "Starting tasks: " + tasks.join " "
+    ngbp.log.subheader "Starting tasks: " + tasks.join " "
+    start = process.hrtime()
+
+    # The last argument is a callback.
+    tasks.push () ->
+      elapsed = process.hrtime( start )
+      s = elapsed[0]
+      ms = elapsed[1] / 1000000
+      ngbp.log.subheader "Completed tasks in #{s}s #{ms.toFixed(0)}ms."
+
     @start.apply( @, tasks )
 
 Tasks::getTasks = () ->
@@ -58,11 +67,20 @@ Tasks::addCleanTask = ( name, target ) ->
     ngbp.file.rimraf target
   taskName
 
-Tasks::addFlowTask = ( flow ) ->
-  taskName = "flow::#{flow.name}"
-  @add taskName, flow.getDependencies(), () ->
-    flow.run()
-  taskName
+Tasks::isPrevented = ( task ) ->
+  allowed = false
+  allow = ngbp.config.get( "allow" ) or []
+  allow.forEach ( t ) ->
+    allowed = true if task is t
+
+  return false if allowed
+
+  prevented = false
+  prevent = ngbp.config.get( "prevent" ) or []
+  prevent.forEach ( t ) ->
+    prevented = true if task is t
+
+  if prevented then true else false
 
 module.exports = new Tasks()
 
