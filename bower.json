@@ -1,6 +1,6 @@
 {
-  "name": "ng-boilerplate",
-  "version": "0.3.2",
+  "name": "appletGdLogin",
+  "version": "0.0.0",
   "devDependencies": {
     "angular": "~1.2",
     "angular-mocks": "~1.2",
@@ -8,5 +8,21 @@
     "angular-bootstrap": "~0.10.0",
     "angular-ui-router": "~0.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "gdClient": "https://github.com/mcnerthney/gdClient.git"
+  },
+  "homepage": "https://github.com/mcnerthney/appletGdLogin",
+  "authors": [
+    "Dan McNerthney <dmcnerthney@greendotcorp.com>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "vendor",
+    "test",
+    "tests"
+  ]
 }
